@@ -9,7 +9,7 @@ submit.addEventListener('click', onSubmit)
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await axios.get('https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses')
+        const response = await axios.get('https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses')
         for (let i = 0; i < response.data.length; i++) {
             console.log(response.data[i])
             appendList(response.data[i])
@@ -22,35 +22,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function onSubmit(event) {
     event.preventDefault()
+    try {
+        if (!(amount.value == '' || description.value == '' || category.value == '')) {
+            myObj = {
+                amt: amount.value,
+                desc: description.value,
+                cat: category.value
+            }
+            amount.value = ''
+            description.value = ''
+            category.value = ''
 
-    if (!(amount.value == '' || description.value == '' || category.value == '')) {
-        myObj = {
-            amt: amount.value,
-            desc: description.value,
-            cat: category.value
-        }
-        amount.value = ''
-        description.value = ''
-        category.value = ''
 
-        try {
-            const response = await axios.get('https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses')
+            const response = await axios.get('https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses')
             for (let i = 0; i < response.data.length; i++) {
                 if (myObj.desc == response.data[i].desc) {
                     let id = response.data[i]._id
-                    await axios.delete(`https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses/${id}`)
+                    await axios.delete(`https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses/${id}`)
                 }
             }
-            await axios.post('https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses', myObj)
-        } catch (error) {
-            console.log(error)
+            await axios.post('https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses', myObj)
+
+            appendList(myObj)
+
+        } else {
+            alert('Enter all values!')
         }
-        appendList(myObj)
-    } else {
-        alert('Enter all values!')
+    } catch (error) {
+        console.log(error)
     }
-
-
 }
 
 //Main Function:
@@ -121,18 +121,16 @@ function appendList(myObj) {
 
 
     async function deleteDivAndData() {
-        const descforremovingfromlocal = deleteButton.previousSibling.previousSibling.previousSibling.innerHTML
+
         try {
-            const response = await axios.get('https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses')
-            for (let i = 0; i < response.data.length; i++) {
-                if (response.data[i].desc == descforremovingfromlocal) {
-                    let id = response.data[i]._id
-                    await axios.delete(`https://crudcrud.com/api/9fcfc44518f0493ab95e2b0a8df2c260/expenses/${id}`)
-                }
-            }
+            const descforremovingfromlocal = deleteButton.previousSibling.previousSibling.previousSibling.innerHTML
+            const response = await axios.get('https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses', { data: { desc: descforremovingfromlocal } })
+            console.log(response)
+            await axios.delete(`https://crudcrud.com/api/cfef11979b154699b7b062b4d91d23bc/expenses/${response.data[0]._id}`)
+            deleteButton.parentElement.remove()
         } catch (error) {
             console.log(error);
         }
-        deleteButton.parentElement.remove()
+
     }
 }
